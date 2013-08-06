@@ -1,0 +1,45 @@
+"""kplot - an hdf5 data veiwer"""
+
+import numpy as np
+import pyqtgraph as pg
+import tables
+import sys
+from PyQt4 import QtGui, QtCore
+
+f = tables.openFile('120820_yy7134_0_0.arf')
+
+
+def plotAll(f):
+    """plot all arrays in file f"""
+    for g in f.walkGroups():
+        print(g)
+        for arr in f.listNodes(g, classname='Array'):
+            if arr.ndim == 1 and arr.shape[0] > 1:
+                pg.plot(arr.read())
+
+
+class MainWindow(QtGui.QWidget):
+    """Main window class"""
+    def __init__(self, parent=None):
+        QtGui.QWidget.__init__(self, parent)
+        self.setGeometry(300, 300, 200, 200)
+        self.setWindowTitle('kplot')
+        quit = QtGui.QPushButton('Close', self)
+        quit.setGeometry(10, 10, 70, 40)
+        self.connect(quit, QtCore.SIGNAL('clicked()'), QtGui.qApp,
+                     QtCore.SLOT('quit()'))
+        treeview = QtGui.
+
+app = QtGui.QApplication(sys.argv)
+mw = MainWindow()
+mw.show()
+
+datawin = pg.GraphicsWindow()
+datawin.setWindowTitle('Data Window')
+p1 = datawin.addPlot(row=1, col=0)
+p2 = datawin.addPlot(row=2, col=0)
+p1.plot(f.getNode('/e66225840/yy7134').read())
+p2.plot(f.getNode('/e66225840/elec').read())
+
+
+sys.exit(app.exec_())
